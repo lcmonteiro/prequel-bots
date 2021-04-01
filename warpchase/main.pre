@@ -1,1 +1,73 @@
+@main:
+IF rotation_last IS UNDEFINED
+  rotation_last := PLAYERS.ROTATION[MY.INDEX]
+  rotation_vel  := 0
+ELSE
+  rotation_vel  := PLAYERS.ROTATION[MY.INDEX] - rotation_last
+  rotation_last := PLAYERS.ROTATION[MY.INDEX]
+ENDIF
+IF state IS UNDEFINED
+  state := 0
+ENDIF
 
+
+# keep the distance
+r := INDEXES.PLAYERS.OTHERS.LENGTH
+l := r
+REPEAT r
+  i := INDEXES.PLAYERS.OTHERS[l-r-1]
+  IF PLAYERS.REMAINING_POWER[i] > 0
+    
+  ENDIF
+ENDREP
+
+# power hunt
+IF INDEXES.POWERS.LENGTH > 0
+  IF state <> 1
+    bearing_new := BEARING.POWER[INDEXES.POWERS[0]]
+    difference  := bearing_new
+    bearing_old := bearing_new
+  ELSE
+    bearing_new := BEARING.POWER[INDEXES.POWERS[0]]
+    difference  := bearing_new - bearing_old
+    bearing_old := bearing_new
+  ENDIF
+  state := 1
+  angle := (90000 - DISTANCE_R.POWER[INDEXES.POWERS[0]] * 1 / 5)
+  IF bearing_new < (90000 - DISTANCE_R.POWER[INDEXES.POWERS[0]] * 1 / 5)
+    WARPCHASE.ACTIVATE()
+  ENDIF
+  IF rotation_vel = 0
+    WARPCHASE.DEACTIVATE()
+  ENDIF
+  IF difference <= 0 
+    WARPCHASE.DEACTIVATE()
+  ENDIF
+  WARPCHASE.ACTIVATE()
+ENDIF
+
+# power points
+IF INDEXES.POINTS.LENGTH > 0
+  IF state <> 2
+    bearing_new := BEARING.POINT[INDEXES.POINTS[0]]
+    difference  := bearing_new
+    bearing_old := bearing_new
+  ELSE
+    bearing_new := BEARING.POINT[INDEXES.POINTS[0]]
+    difference  := bearing_new - bearing_old
+    bearing_old := bearing_new
+  ENDIF
+  state := 2
+  angle := (85000 - DISTANCE_R.POINT[INDEXES.POINTS[0]] * 1 / 5)
+  IF bearing_new < (85000 - DISTANCE_R.POINT[INDEXES.POINTS[0]] * 1 / 5)
+    WARPCHASE.ACTIVATE()
+  ENDIF
+  IF rotation_vel = 0
+    WARPCHASE.DEACTIVATE()
+  ENDIF
+  IF difference <= 0 
+    WARPCHASE.DEACTIVATE()
+  ENDIF
+  WARPCHASE.ACTIVATE()
+ENDIF
+WARPCHASE.ACTIVATE() 
